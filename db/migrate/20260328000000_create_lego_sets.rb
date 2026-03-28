@@ -1,6 +1,6 @@
 class CreateLegoSets < ActiveRecord::Migration[8.1]
   def change
-    create_table :lego_sets do |t|
+    create_table :lego_api_lego_sets do |t|
       t.string :name
       t.string :external_id
       t.string :theme
@@ -11,6 +11,6 @@ class CreateLegoSets < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :lego_sets, :external_id, unique: true
+    add_index :lego_api_lego_sets, :external_id, unique: true
   end
 end

@@ -1,6 +1,6 @@
 class CreateRequestLogs < ActiveRecord::Migration[8.1]
   def change
-    create_table :request_logs do |t|
+    create_table :lego_api_request_logs do |t|
       t.string :request_id
       t.string :http_method, null: false
       t.string :path, null: false
@@ -16,9 +16,9 @@ class CreateRequestLogs < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :request_logs, :created_at
-    add_index :request_logs, :request_id
-    add_index :request_logs, :ip
-    add_index :request_logs, :path
+    add_index :lego_api_request_logs, :created_at
+    add_index :lego_api_request_logs, :request_id
+    add_index :lego_api_request_logs, :ip
+    add_index :lego_api_request_logs, :path
   end
 end
