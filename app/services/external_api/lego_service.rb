@@ -10,16 +10,8 @@ module ExternalApi
     THEME_CACHE_TTL = 60 * 60
 
     def self.random_set(theme: nil)
-      count_response = get("/sets/", headers: auth_headers, query: { page: 1, page_size: 1 })
-      count_payload = count_response.parsed_response
-      total_count = count_payload.is_a?(Hash) ? count_payload["count"].to_i : 0
-
-      page_size = DEFAULT_PAGE_SIZE
-      total_pages = total_count.positive? ? (total_count.to_f / page_size).ceil : 1
-      page = rand(1..[ total_pages, 1000 ].min)
-
-      theme_id = theme.present? ? resolve_theme_id(theme) : nil
-      if theme.present? && theme_id.nil?
+      theme_candidates = theme.present? ? resolve_theme_candidates(theme) : [ nil ]
+      if theme.present? && theme_candidates.empty?
         return {
           "raw" => {},
           "normalized" => {},
@@ -30,14 +22,41 @@ module ExternalApi
         }
       end
 
-      list_response = get(
-        "/sets/",
-        headers: auth_headers,
-        query: build_list_query(page: page, page_size: page_size, theme_id: theme_id)
-      )
-      list_payload = list_response.parsed_response
-      selected = pick_random_set(list_payload)
-      return fallback_empty(list_response.code) unless selected
+      page_size = DEFAULT_PAGE_SIZE
+      selected = nil
+      list_response = nil
+      total_count = 0
+      theme_id = nil
+      page_used = nil
+
+      theme_candidates.each do |candidate_id|
+        count_response = get(
+          "/sets/",
+          headers: auth_headers,
+          query: build_list_query(page: 1, page_size: 1, theme_id: candidate_id)
+        )
+        count_payload = count_response.parsed_response
+        next unless count_payload.is_a?(Hash)
+
+        total_count = count_payload["count"].to_i
+        total_pages = total_count.positive? ? (total_count.to_f / page_size).ceil : 1
+        page = rand(1..[ total_pages, 1000 ].min)
+
+        list_response = get(
+          "/sets/",
+          headers: auth_headers,
+          query: build_list_query(page: page, page_size: page_size, theme_id: candidate_id)
+        )
+        list_payload = list_response.parsed_response
+        selected = pick_random_set(list_payload)
+        if selected
+          theme_id = candidate_id
+          page_used = page
+          break
+        end
+      end
+
+      return fallback_empty(list_response&.code) unless selected
 
       detail_result = fetch_set_details(selected)
       detail_payload = detail_result ? detail_result["payload"] : nil
@@ -47,12 +66,12 @@ module ExternalApi
         "raw" => detail_payload || selected,
         "normalized" => normalize_set(detail_payload || selected),
         "metadata" => {
-          "page" => page,
+          "page" => page_used,
           "page_size" => page_size,
           "total_count" => total_count,
-          "list_status" => list_response.code,
+          "list_status" => list_response&.code,
           "detail_status" => detail_status,
-          "upstream_status" => detail_status || list_response.code,
+          "upstream_status" => detail_status || list_response&.code,
           "theme" => theme,
           "theme_id" => theme_id
         }
@@ -126,24 +145,28 @@ module ExternalApi
     end
     private_class_method :build_list_query
 
-    def self.resolve_theme_id(theme_key)
+    def self.resolve_theme_candidates(theme_key)
       normalized_key = normalize_theme_key(theme_key)
-      return nil if normalized_key.empty?
+      return [] if normalized_key.empty?
 
       themes = fetch_themes
-      return nil if themes.empty?
+      return [] if themes.empty?
 
-      exact = themes.find do |theme|
-        normalize_theme_key(theme_name(theme)) == normalized_key
-      end
-      return extract_theme_id(exact) if exact
-
-      partial = themes.find do |theme|
+      matches = themes.select do |theme|
         normalize_theme_key(theme_name(theme)).include?(normalized_key)
       end
-      extract_theme_id(partial)
+
+      matches.sort_by do |theme|
+        name = normalize_theme_key(theme_name(theme))
+        [
+          name == normalized_key ? 0 : 1,
+          name.start_with?(normalized_key) ? 0 : 1,
+          theme["parent_id"].nil? ? 0 : 1,
+          name.length
+        ]
+      end.map { |theme| extract_theme_id(theme) }.compact.uniq
     end
-    private_class_method :resolve_theme_id
+    private_class_method :resolve_theme_candidates
 
     def self.fetch_themes
       now = Time.now.to_i

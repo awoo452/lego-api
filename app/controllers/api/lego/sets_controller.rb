@@ -24,6 +24,19 @@ module Api
           return render json: { error: "Unknown theme." }, status: :unprocessable_entity
         end
 
+        if metadata["error"] == "no_results"
+          append_request_log_metadata(
+            lego: {
+              "error" => metadata["error"],
+              "theme" => metadata["theme"]
+            },
+            persist_param: params[:persist],
+            lego_set_id: nil
+          )
+
+          return render json: { error: "No sets found for that theme." }, status: :not_found
+        end
+
         lego_set_record = nil
         persist = params.fetch(:persist, "true").to_s.downcase != "false"
         if persist && normalized["external_id"].present?
