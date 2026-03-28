@@ -4,11 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/
 spec/v2.0.0.html).
 
+## [0.0.5] - 2026-03-28
+### Added
+- Added optional theme filtering for `GET /lego/sets/random` using `theme=city|minecraft|creator`.
+- Added theme metadata to request logs and API metadata.
+
 ## [0.0.4] - 2026-03-28
 ### Changed
 - Namespaced database tables with `lego_api_` prefixes to avoid collisions in shared databases.
 - Made the request log FK migration create the namespaced LEGO sets table when missing.
 - Fixed the request log foreign key to target `lego_set_id` correctly.
+- Corrected schema foreign key to reference `lego_set_id`.
 
 ## [0.0.3] - 2026-03-28
 ### Changed

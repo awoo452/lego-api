@@ -49,5 +49,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_000002) do
     t.index ["request_id"], name: "index_lego_api_request_logs_on_request_id"
   end
 
-  add_foreign_key "lego_api_request_logs", "lego_api_lego_sets"
+  add_foreign_key "lego_api_request_logs", "lego_api_lego_sets", column: "lego_set_id"
 end

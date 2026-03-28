@@ -3,10 +3,26 @@ module Api
   module Lego
     class SetsController < ApplicationController
       def random
-        result = ExternalApi::LegoService.random_set
+        theme = params[:theme].to_s.strip
+        theme = nil if theme.empty?
+
+        result = ExternalApi::LegoService.random_set(theme: theme)
         normalized = result["normalized"] || {}
         raw = result["raw"]
         metadata = result["metadata"] || {}
+
+        if metadata["error"] == "unknown_theme"
+          append_request_log_metadata(
+            lego: {
+              "error" => metadata["error"],
+              "theme" => metadata["theme"]
+            },
+            persist_param: params[:persist],
+            lego_set_id: nil
+          )
+
+          return render json: { error: "Unknown theme." }, status: :unprocessable_entity
+        end
 
         lego_set_record = nil
         persist = params.fetch(:persist, "true").to_s.downcase != "false"
@@ -32,7 +48,9 @@ module Api
             "name" => normalized["name"],
             "theme" => normalized["theme"],
             "num_parts" => normalized["num_parts"],
-            "upstream_status" => metadata["upstream_status"]
+            "upstream_status" => metadata["upstream_status"],
+            "theme_filter" => theme,
+            "theme_id" => metadata["theme_id"]
           },
           persist_param: params[:persist],
           lego_set_id: lego_set_record&.id

@@ -10,6 +10,7 @@ A Ruby on Rails API that fetches a random LEGO set from the Rebrickable API, log
 
 Query parameters:
 - `persist=false` skips writing to the database (default persists the set).
+- `theme=city|minecraft|creator` filters the random set to a specific theme.
 
 Side effects (when `persist` is not `false`):
 - Creates or updates a `LegoSet` record with `name`, `external_id`, `theme`, `num_parts`, `image_url`, `raw_data`.
