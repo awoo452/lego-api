@@ -14,7 +14,7 @@ module ExternalApi
 
       page_size = DEFAULT_PAGE_SIZE
       total_pages = total_count.positive? ? (total_count.to_f / page_size).ceil : 1
-      page = rand(1..[total_pages, 1000].min)
+      page = rand(1..[ total_pages, 1000 ].min)
 
       list_response = get(
         "/sets/",

@@ -32,7 +32,7 @@ Rack::Attack.throttled_responder = lambda do |req|
       "Content-Type" => "application/json",
       "Retry-After" => retry_after.to_s
     },
-    [body]
+    [ body ]
   ]
 end
 

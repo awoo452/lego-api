@@ -16,7 +16,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
 
   if origins_list.empty?
     if Rails.env.development? || Rails.env.test?
-      origins_list = ["http://localhost:3000", "http://127.0.0.1:3000"]
+      origins_list = [ "http://localhost:3000", "http://127.0.0.1:3000" ]
     else
       origins_list = default_prod_origins
       Rails.logger.info("CORS_ORIGINS is not set; defaulting to #{origins_list.join(', ')}.")
@@ -29,7 +29,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
 
       resource "*",
         headers: :any,
-        methods: [:get, :options, :head]
+        methods: [ :get, :options, :head ]
     end
   end
 end
