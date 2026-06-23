@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/
 spec/v2.0.0.html).
 
+## [0.0.11] - 2026-06-23
+### Changed
+- Updated `concurrent-ruby` to 1.3.7 to address CVE-2026-54904, CVE-2026-54905, CVE-2026-54906.
+
 ## [0.0.10] - 2026-06-22
 ### Changed
 - Updated `brakeman` to 8.0.5.
