@@ -9,6 +9,25 @@ module ExternalApi
     DEFAULT_THEME_PAGE_SIZE = 1000
     THEME_CACHE_TTL = 60 * 60
 
+    def self.lookup_by_number(set_number:)
+      set_num = set_number.to_s.strip
+      return { "normalized" => {}, "metadata" => { "error" => "missing_set_number" } } if set_num.empty?
+
+      # Rebrickable uses "60408-1" format; append "-1" if no dash present
+      rebrickable_num = set_num.include?("-") ? set_num : "#{set_num}-1"
+
+      detail_response = get("/sets/#{rebrickable_num}/", headers: auth_headers)
+      payload = detail_response.parsed_response
+
+      unless detail_response.success? && payload.is_a?(Hash) && payload["set_num"].present?
+        return { "normalized" => {}, "raw" => {}, "metadata" => { "error" => "not_found", "upstream_status" => detail_response.code } }
+      end
+
+      normalized = normalize_set(payload)
+
+      { "normalized" => normalized, "raw" => payload, "metadata" => { "upstream_status" => detail_response.code } }
+    end
+
     def self.random_set(theme: nil)
       theme_candidates = theme.present? ? resolve_theme_candidates(theme) : [ nil ]
       if theme.present? && theme_candidates.empty?

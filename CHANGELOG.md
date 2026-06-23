@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/
 spec/v2.0.0.html).
 
+## [0.0.9] - 2026-06-22
+### Changed
+- Updated `addressable` to 2.9.0, `nokogiri` to 1.19.4, `puma` to 8.0.2, `rack` to 3.2.6, `rack-session` to 2.1.2, `net-imap` to 0.6.4.1, `erb` to 6.0.4 to address security vulnerabilities.
+
+## [0.0.8] - 2026-06-22
+### Added
+- `GET /lego/sets/lookup?set_number=60408` — looks up a specific LEGO set by number from Rebrickable, persists to `lego_api_lego_sets`, returns name/external_id/theme/num_parts/image_url. Appends "-1" suffix automatically if not present.
+- `ExternalApi::LegoService.lookup_by_number(set_number:)` — direct Rebrickable fetch by set number.
+
 ## [0.0.7] - 2026-03-30
 ### Changed
 - Updated mcp to 0.10.0 to address CVE-2026-33946.

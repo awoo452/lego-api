@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   namespace :lego, module: "api/lego" do
     namespace :sets do
       get :random
+      get :lookup
     end
   end
 

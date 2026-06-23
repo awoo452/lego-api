@@ -78,6 +78,41 @@ module Api
           raw: raw
         }
       end
+
+      def lookup
+        set_number = params[:set_number].to_s.strip
+
+        if set_number.empty?
+          return render json: { error: "set_number is required." }, status: :bad_request
+        end
+
+        result     = ExternalApi::LegoService.lookup_by_number(set_number: set_number)
+        normalized = result["normalized"] || {}
+        raw        = result["raw"] || {}
+        metadata   = result["metadata"] || {}
+
+        if metadata["error"] == "not_found" || normalized["external_id"].blank?
+          return render json: { error: "Set not found." }, status: :not_found
+        end
+
+        lego_set_record = LegoSet.find_or_initialize_by(external_id: normalized["external_id"])
+        lego_set_record.assign_attributes(
+          name: normalized["name"],
+          theme: normalized["theme"],
+          num_parts: normalized["num_parts"],
+          image_url: normalized["image_url"],
+          raw_data: raw
+        )
+        lego_set_record.save
+
+        render json: {
+          name: normalized["name"],
+          external_id: normalized["external_id"],
+          theme: normalized["theme"],
+          num_parts: normalized["num_parts"],
+          image_url: normalized["image_url"]
+        }
+      end
     end
   end
 end
