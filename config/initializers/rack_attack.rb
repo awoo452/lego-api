@@ -11,9 +11,11 @@ Rack::Attack.cache.store = cache_store
 RATE_LIMIT_PER_MINUTE = ENV.fetch("RATE_LIMIT_PER_MINUTE", "3").to_i
 
 Rack::Attack.throttle("lego/sets/random by ip", limit: RATE_LIMIT_PER_MINUTE, period: 1.minute) do |req|
-  if req.get? && req.path == "/lego/sets/random"
-    req.ip
-  end
+  req.ip if req.get? && req.path == "/lego/sets/random"
+end
+
+Rack::Attack.throttle("lego/sets/lookup by ip", limit: RATE_LIMIT_PER_MINUTE, period: 1.minute) do |req|
+  req.ip if req.get? && req.path == "/lego/sets/lookup"
 end
 
 Rack::Attack.throttled_responder = lambda do |req|
