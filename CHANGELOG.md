@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/
 spec/v2.0.0.html).
 
+## [0.0.13] - 2026-07-20
+### Added
+- `Procfile` — this repo was missing it entirely, unlike its sibling APIs (pokemon-api, vehicle-api), which both declare `web: bundle exec puma -C config/puma.rb`.
+
 ## [0.0.12] - 2026-06-23
 ### Fixed
 - Rate limiting now applies to `GET /lego/sets/lookup` in addition to `GET /lego/sets/random`.
