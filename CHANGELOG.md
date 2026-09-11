@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/
 spec/v2.0.0.html).
 
+## [0.0.15] - 2026-09-11
+### Added
+- `CLAUDE.md`: points agents at the Rails Playbook, lists the rules broken most often, and says which of the playbook's `hosting/` notes apply here.
+- `AGENTS.md`: sends Codex and other agents to `CLAUDE.md`.
+
 ## [0.0.14] - 2026-07-20
 ### Security
 - Ran `bundler-audit`, which was failing in CI on `main` — none of these had open dependabot PRs (transitive/indirect dependencies aren't covered by the scheduled version-update config the same way direct Gemfile gems are). Bumped: `crass` 1.0.6 → 1.0.7 (four CSS-parsing DoS advisories), `loofah` 2.25.1 → 2.25.2, `rails-html-sanitizer` 1.7.0 → 1.7.1 (possible XSS), `mcp` 0.10.0 → 0.25.0 (five advisories: memory exhaustion, session poisoning, DNS-rebinding; pulled in a `json_schemer`/`hana`/`simpleidn` dependency swap from mcp's own upstream, replacing `json-schema`), `websocket-driver` 0.8.0 → 0.8.2 (four advisories), `concurrent-ruby` 1.3.7 → 1.3.8, `msgpack` 1.8.0 → 1.8.3 (use-after-free), `json` 2.19.3 → 2.21.1, `erb` 6.0.4 → 6.0.6 (deserialization guard bypass). `addressable`, `net-imap`, `nokogiri`, `rack`, and `rack-session` were already at safe versions from an earlier round. All transitive, no direct Gemfile changes. `bundler-audit check` and `brakeman` both clean afterward.
